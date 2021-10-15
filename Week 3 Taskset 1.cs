@@ -7,6 +7,10 @@ public class CubeScript : MonoBehaviour //I edited the main script instead of cr
 
     void OnMouseDown()
     {
+      if(bool) 
+      {
+        // code block 
+      } 
 		switch (instType)
 		{
             case 1:
