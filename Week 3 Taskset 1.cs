@@ -7,11 +7,7 @@ public class CubeScript : MonoBehaviour //I edited the main script instead of cr
 
     void OnMouseDown()
     {
-      if(bool) 
-      {
-        // code block 
-      } 
-		switch (instType)
+    	switch (instType)
 		{
             case 1:
                 transform.Rotate(0, rotationAmount, 0);
@@ -23,7 +19,9 @@ public class CubeScript : MonoBehaviour //I edited the main script instead of cr
             case 3:
                 transform.Rotate(0, rotationAmount, 0);
                 break;
-            default: print("(user) error"); break;
+            default: 
+		print("(user) error"); 
+		break;
 
         }
        
