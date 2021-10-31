@@ -1,3 +1,17 @@
+/*
+1 Make int var 4
+2 output to console
+3 int var *= 10
+4 make second int var
+5 output int1 + int2
+
+Extra: 
+output int var3 = int1 *int2
+rotate cube ny int 3
+make on frame
+use floats
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
