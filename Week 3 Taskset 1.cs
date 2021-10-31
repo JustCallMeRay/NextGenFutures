@@ -1,3 +1,10 @@
+/*
+cube 1 spins
+cube 2 jumps and spins
+cube 3 spin 30 per click
+extra: 
+change jump to ridgid body
+*/ 
 using UnityEngine;
 
 public class CubeScript : MonoBehaviour //I edited the main script instead of creating a new one which is why I lost it :(
