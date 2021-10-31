@@ -1,3 +1,16 @@
+/*
+1 Write "Hello world" in console
+2 Make string called player name
+3 set player name to my name
+4 console greet player by name
+
+Extra: 
+make happen when cube is clicked
+destroy the cube
+"make cube curse its existance via console"
+"push it?????"
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
