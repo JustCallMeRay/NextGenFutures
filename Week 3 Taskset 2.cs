@@ -1,3 +1,15 @@
+/*
+Brief:
+1 Store int clicks in class
+2 Clicks ++ on click
+3 Destroy gameobject when clicks > 10
+
+Extra 
+1 Rotate cube based on clicks
+2 Scale cube based on clicks 
+3 Record time on 1st and 10th click
+4 log time for 10 clicks
+*/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
