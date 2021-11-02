@@ -22,12 +22,12 @@ public class MessingAbout : MonoBehaviour //Direct quote.
 
 
         for (int i = 0; i < verts.Length; i++)
-		{
-            if(verts[i].y > 0)
-		      	{
+	{
+		if(verts[i].y > 0)
+	      	{
                  verts[i].y++; 
-			    }
-			}
+		}
+	}
     }
 
  
