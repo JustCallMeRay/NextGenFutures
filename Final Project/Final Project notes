@@ -25,5 +25,7 @@ Coursework To do list
 			Doesn't work as gradients ruin colour ID system, 
 				channel bool system allows for 10 biomes.
 				or 6 with alpha. 
+                        Use base unity vorinoi to colour cells
+                        use GetPixels(int x, int y, int blockWidth, int blockHeight, int miplevel); in c#
 		}
 	}
