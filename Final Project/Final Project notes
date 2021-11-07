@@ -26,6 +26,7 @@ Coursework To do list
 				channel bool system allows for 10 biomes.
 				or 6 with alpha. 
                         Use base unity vorinoi to colour cells
+                        multi noise X cell mask 
                         use GetPixels(int x, int y, int blockWidth, int blockHeight, int miplevel); in c#
 		}
 	}
