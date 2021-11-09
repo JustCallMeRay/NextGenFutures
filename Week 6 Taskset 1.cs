@@ -33,7 +33,7 @@ public class Room1WallText : MonoBehaviour
 	    {
 		    Time.timeScale = 0.5f;
 	    }
-    }
+    }								//Why did you give two scripts to fill?
 
     private void OnTriggerExit(Collider other)
     {
