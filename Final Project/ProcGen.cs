@@ -11,7 +11,7 @@ public partial class ProcGen
     private const uint BITNOISE1 = 0xB5297A4D;
     private const uint BITNOISE2 = 0x68E31DA4;
     private const uint BITNOISE3 = 0x1B56C4E9;
-    private static uint RandCalled = 0;
+    private static uint RandCalled = 0;     //Makes things slightly more random
     public static Vector4[] DebugPoints()
     {
             return new Vector4[]      //~~float2 on shader, float 4 on cpu?~~
@@ -84,6 +84,7 @@ public partial class ProcGen
     }
     
     //Overload 0
+    [Obsolete("Use a vector 2 instead")]
     public uint RandNoise(int posx = int.MaxValue,int posy =int.MaxValue, uint seed = 0)
     {
         //slightly more random if used as rand(), don't know if partial class resets vars?
@@ -104,9 +105,110 @@ public partial class ProcGen
         ret += (uint)posy;
         return ret;
     }
+    //Overload 1
+    public uint RandNoise(Vector2 pos, uint seed = 0)
+    {
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        pos.x = (int)((pos.x == int.MaxValue) ? RandCalled : (uint)pos.x);
+        pos.y = (int)((pos.y == int.MaxValue) ? RandCalled : (uint)pos.y);
+        seed = (seed == 0) ? RandCalled : seed;
+        uint ret = (uint)pos.x*32;
 
+        //Randomness 
+        ret *= BITNOISE1;
+        ret += seed;
+        ret ^= (ret >> 8);
+        ret += BITNOISE2;
+        ret ^= (ret << 8);
+        ret *= BITNOISE3;
+        ret ^= (ret >> 8);
+        ret += (uint)pos.y*256;
+        return ret;
+    }
     //Overload 2
-    public double RandNoise(Vector2 pos, uint seed = 0)
+    public uint RandNoise(Vector3 pos, uint seed = 0)
+    { 
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        pos.x = (int)((pos.x == int.MaxValue) ? RandCalled : (uint)pos.x);
+        pos.y = (int)((pos.y == int.MaxValue) ? RandCalled : (uint)pos.y);
+        seed = (seed == 0) ? RandCalled : seed;
+        uint ret = (uint)(pos.x+1)*128;
+
+        //Randomness 
+        ret *= BITNOISE1;
+        ret += seed;
+        ret ^= (ret >> 8);
+        ret += BITNOISE2;
+        ret *= (uint)(pos.z + 2) * 1024;
+        ret ^= (ret << 8);
+        ret *= BITNOISE3;
+        ret ^= (ret >> 8);
+        ret += (uint)pos.y;
+        return ret;
+    }
+    //Overload 3
+    public uint RandNoise(Vector4 pos, uint seed = 0)
+    {
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        pos.x = (int)((pos.x == int.MaxValue) ? RandCalled : (uint)pos.x);
+        pos.y = (int)((pos.y == int.MaxValue) ? RandCalled : (uint)pos.y);
+        seed = (seed == 0) ? RandCalled : seed; //seed must be stated else gives more rand
+        uint ret = (uint)pos.x*128;
+
+        //Randomness 
+        ret *= BITNOISE1;
+        ret += seed;
+        ret ^= (ret >> 8);
+        ret += BITNOISE2;
+        ret *= (uint)(pos.z + 2) * 1024;
+        ret ^= (ret << 8);
+        ret *= BITNOISE3;
+        ret ^= (ret >> 8);
+        ret += (uint)pos.y*512;
+        return ret;
+    }
+
+
+    //Overload 0
+    public double RandNoisefloat0to1(Vector2 pos, uint seed = 0)
+    {
+        return RandNoise(pos, seed) / uint.MaxValue;
+    }
+    //Overload 1
+    public double RandNoisefloat0to1(Vector3 pos, uint seed = 0)
+    {
+        return RandNoise(pos, seed) / uint.MaxValue;
+	}
+    //Overload 2
+    public double RandNoisefloat0to1(Vector4 pos, uint seed = 0)
+    {
+        return RandNoise(pos, seed) / uint.MaxValue;
+    }
+
+
+    //Overload 0
+    public double RandNoiseFNeg1to1(Vector2 pos, uint seed = 0)
+    {
+        return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
+    }
+    //Overload 1
+    public double RandNoiseFNeg1to1(Vector3 pos, uint seed = 0)
+    {
+		return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
+    }
+    //Overload 2
+    public double RandNoiseFNeg1to1(Vector4 pos, uint seed = 0)
+    {
+        return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
+    }
+
+
+
+    //Overload 0
+    public double RandNoisef(Vector2 pos, uint seed = 0)
     {
         //slightly more random if used as rand(), don't know if partial class resets vars?
         RandCalled++;
@@ -125,9 +227,8 @@ public partial class ProcGen
         reti += (uint)pos.y;
         return retf;
     }
-
-    //Overload 3
-    public double RandNoise(Vector3 pos, uint seed = 0)
+    //Overload 1
+    public double RandNoisef(Vector3 pos, uint seed = 0)
     {
         //slightly more random if used as rand(), don't know if partial class resets vars?
         RandCalled++;
@@ -147,6 +248,28 @@ public partial class ProcGen
         reti += (uint)pos.y;
         return retf;
     }
+    //Overload 2
+    public double RandNoisef(Vector4 pos, uint seed = 0)
+    {
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        seed = (seed == 0) ? RandCalled : seed;
+        uint reti = (uint)(pos.x + 2) * 1024;
+
+        //Randomness 
+        reti *= BITNOISE1;
+        reti += seed;
+        reti ^= (reti >> 8);
+        reti += BITNOISE2;
+        reti *= (uint)(pos.z + 2) * 1024;
+        reti ^= (reti << 8);
+        reti *= BITNOISE3;
+        reti ^= (reti >> 8);
+        double retf = (reti + Math.PI) / 1024f;
+        reti += (uint)pos.y;
+        return retf;
+    }
+
 
     //Overload 0
     public bool RandNoiseBool(float bias = 0.5f)
@@ -162,7 +285,6 @@ public partial class ProcGen
         }
         return ret;
 	}
-
     //Overload 1
     public bool RandNoiseBool(Vector2 pos, float bias = 0.5f)
     {
