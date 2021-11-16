@@ -30,6 +30,6 @@ public class Mycoin : MonoBehaviour
         CoinFlipAnim.Play();
         int rand = Mathf.RoundToInt(Random.value);
         material.SetInteger("Face", rand);	// anim shopuld take longer than a drawcall, else weirdness 
-        return (rand == 1);
-	}
+        return (rand == 1);				//doesn't have a .SetBool
+	}						// Didn't have time to write a hlsl shader and urp wasn't in the project 
 }
