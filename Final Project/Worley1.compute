@@ -24,7 +24,7 @@ static half3 Mask[7] =
         half3(0.0, 1.0, 0.0),   //1
         half3(0.0, 0.0, 1.0),   //2
         half3(1.0, 1.0, 0.0),   //3    //wasn't exe'd -
-        half3(0.0, 1.0, 1.0),   //4
+        half3(0.0, 1.0, 1.0),   //4         //works now, don't know why.
         half3(1.0, 0.0, 1.0),   //5
         half3(1.0, 1.0, 1.0)    //6
     };
@@ -36,11 +36,11 @@ float4 getmin(float2 id)
 	float m_dist = 1.0;
 	float dist[9] =
 	{
-		distance(id, points[0].xy),
-        distance(id, points[1].xy),
-        distance(id, points[2].xy),
-        distance(id, points[3].xy),
-        distance(id, points[4].xy),
+		distance(id, points[0].xy),     //make more efficent with 
+        distance(id, points[1].xy),         //(id - point calculation)^2
+        distance(id, points[2].xy),         //pow(x,2) is less efficent than x*x
+        distance(id, points[3].xy),         // also do in for loop to make me 
+        distance(id, points[4].xy),         //look less incompitant.
         distance(id, points[5].xy),
         distance(id, points[6].xy),
         distance(id, points[7].xy),
@@ -77,87 +77,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 	Result[id.xy] = float4(getmin(id.xy / res.xy).rgba);
 	//Result[id.xy] = float4(points[res.z].xyz, 1);
     
-    
-    
-    /*
-    if   
-       (   (pow(((id.x / res.x) - points[0].x), 2)  +
-            pow(((id.y / res.y) - points[0].y), 2)  )<  
-           (pow(((id.x / res.x) - points[1].x), 2) +
-            pow(((id.y / res.y) - points[1].y), 2)  )
-       )
-	{
-		Result[id.xy] = distance(id.xy / res.xy, points[0]);
 
-	} else 
-	if   
-       (   (pow(((id.x / res.x) - points[1].x), 2)  +
-            pow(((id.y / res.y) - points[1].y), 2)  )<  
-           (pow(((id.x / res.x) - points[2].x), 2) +
-            pow(((id.y / res.y) - points[2].y), 2)  )
-       )
-	{
-		Result[id.xy] = float4(Mask[1], 1);
-	} else 
-    if   
-       (   (pow(((id.x / res.x) - points[2].x), 2)  +
-            pow(((id.y / res.y) - points[2].y), 2)  )<  
-           (pow(((id.x / res.x) - points[3].x), 2) +
-            pow(((id.y / res.y) - points[3].y), 2)  )
-       )
-	{
-		Result[id.xy] = float4(Mask[2], 1);
-	} else 
-    if   
-       (   (pow(((id.x / res.x) - points[3].x), 2)  +
-            pow(((id.y / res.y) - points[3].y), 2)  )<  
-           (pow(((id.x / res.x) - points[4].x), 2) +
-            pow(((id.y / res.y) - points[4].y), 2)  )
-       )
-	{
-		Result[id.xy] = float4(Mask[3], 1);
-	} else 
-    if   
-       (   (pow(((id.x / res.x) - points[4].x), 2)  +
-            pow(((id.y / res.y) - points[4].y), 2)  )<  
-           (pow(((id.x / res.x) - points[5].x), 2) +
-            pow(((id.y / res.y) - points[5].y), 2)  )
-       )
-	{
-		Result[id.xy] = float4(Mask[4], 1);
-	} else
-    if   
-       (   (pow(((id.x / res.x) - points[5].x), 2)  +
-            pow(((id.y / res.y) - points[5].y), 2)  )<  
-           (pow(((id.x / res.x) - points[6].x), 2) +
-            pow(((id.y / res.y) - points[6].y), 2)  )
-       )
-	{
-		Result[id.xy] = float4(Mask[5], 1);
-	} else
-    if   
-       (   (pow(((id.x / res.x) - points[6].x), 2)  +
-            pow(((id.y / res.y) - points[6].y), 2)  )<  
-           (pow(((id.x / res.x) - points[7].x), 2) +
-            pow(((id.y / res.y) - points[7].y), 2)  )
-       )
-	{
-		Result[id.xy] = float4(Mask[6], 1);
-	} else if
-       ((pow(((id.x / res.x) - points[4].x), 2) +
-            pow(((id.y / res.y) - points[4].y), 2)) <
-           (pow(((id.x / res.x) - points[5].x), 2) +
-            pow(((id.y / res.y) - points[5].y), 2))
-       )
-	{
-		Result[id.xy] = float4(Mask[4], 1);
-	}
-	else 
-    {
-		Result[id.xy] = float4(0, 0, 0, 1);
-	}*/
-    
-//
 
 }
 

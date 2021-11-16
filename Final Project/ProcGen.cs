@@ -6,9 +6,12 @@ using UnityEngine;
 public partial class ProcGen
 {
     public static ComputeShader DefaultComp; //get a ref to compute shader? 
-    public static RenderTexture DefaultRT;
-    public static int[] Threadcount; 
-
+    public static RenderTexture DefaultRT;      // and set as const 
+    public static int[] Threadcount;     //unused
+    private const uint BITNOISE1 = 0xB5297A4D;
+    private const uint BITNOISE2 = 0x68E31DA4;
+    private const uint BITNOISE3 = 0x1B56C4E9;
+    private static uint RandCalled = 0;
     public static Vector4[] DebugPoints()
     {
             return new Vector4[]      //~~float2 on shader, float 4 on cpu?~~
@@ -25,27 +28,6 @@ public partial class ProcGen
             new Vector4(10, 10,              1, 1 )
             };
     }
-   
-    [Obsolete("Use vec4 points, not floats")]
-    public static float[,] DebugPoints(float Type)
-    {
-       
-            return new float[9, 4]      //float2 on shader, float 4 on cpu?
-        {  
-            { 0, 0, 0, 0 },
-            { 1, 1, 1, 1 },
-            { 0.5f, 0.5f, 0.5f, 1 },
-            { 0, 1, 1, 1 },
-            { 1, 0, 1, 1 },
-            { 0.2f, 0.6f, 1, 1 },
-            { 10, 10, 1, 1 },
-            { 10, 10, 1, 1 },
-            { 10, 10, 1, 1 }
-        };
-        
-    }
-        
-    
 
 
     public static void DebugComputeShader(
@@ -61,7 +43,7 @@ public partial class ProcGen
         POINTS = (POINTS == null ? DebugPoints() : POINTS);
         //ComputeShader = (ComputeShader == null ? defRef : ComputeShader);
         int[] resolution = { resolutionx, resolutiony };
-        //renderTexture = new RenderTexture(resolution[0], resolution[1], 24);
+        renderTexture = new RenderTexture(resolution[0], resolution[1], 24);
         renderTexture.enableRandomWrite = true;
         renderTexture.Create();
 
@@ -74,59 +56,165 @@ public partial class ProcGen
             renderTexture.width / Threadcountx,
             renderTexture.height / Threadcounty, 1);
         new WaitForSeconds(0.5f);
-        CallRefresh(ComputeShader, renderTexture);
-    }
-    
-
-    [Obsolete("Use vec4 points, not floats")]
-    public static void DebugComputeShader(
-        RenderTexture renderTexture,
-        ComputeShader ComputeShader,
-        float type,
-        float[,] POINTS = null,
-        int resolutionx = 256,
-        int resolutiony = 256,
-        int Threadcountx = 8,
-        int Threadcounty = 8
-        )
-    {
-        POINTS = (POINTS == null ? DebugPoints(0f) : POINTS);
-        //ComputeShader = (ComputeShader == null ? defRef : ComputeShader);
-        int[] resolution = { resolutionx, resolutiony }; 
-        //renderTexture = new RenderTexture(resolution[0], resolution[1], 24);    //3d texture?
-        renderTexture.enableRandomWrite = true;
-        renderTexture.Create();
-
-
-        ComputeShader.SetTexture(0, "Result", renderTexture);
-        ComputeShader.SetFloats("res", renderTexture.width, renderTexture.height);
-        ComputeShader.SetFloats("points",
-        POINTS[0, 0], POINTS[0, 1], //POINTS[0, 2], POINTS[0, 3],
-        POINTS[1, 0], POINTS[1, 1], //POINTS[1, 2], POINTS[1, 3],
-        POINTS[2, 0], POINTS[2, 1], //POINTS[2, 2], POINTS[2, 3],
-        POINTS[3, 0], POINTS[3, 1], //POINTS[3, 2], POINTS[3, 3],
-        POINTS[4, 0], POINTS[4, 1], //POINTS[4, 2], POINTS[4, 3],
-        POINTS[5, 0], POINTS[5, 1], //POINTS[5, 2], POINTS[5, 3],
-        POINTS[6, 0], POINTS[6, 1], //POINTS[6, 2], POINTS[6, 3],
-        POINTS[7, 0], POINTS[7, 1], //POINTS[7, 2], POINTS[7, 3],
-        POINTS[8, 0], POINTS[8, 1]//, POINTS[8, 2], POINTS[8, 3]
-        );                    // I would like to nominate this as the worst code ever
-
-        ComputeShader.Dispatch(0, 
-            renderTexture.width / Threadcountx,
-            renderTexture.height / Threadcounty, 1);
-       new WaitForSeconds(0.5f);
-       CallRefresh(ComputeShader,renderTexture);
+        RefreshCompute(ComputeShader, renderTexture);
     }
 
-
-
-
-    public static void CallRefresh(ComputeShader ComputeShader, RenderTexture renderTexture)
+    public static void RefreshCompute(ComputeShader ComputeShader, RenderTexture renderTexture)
     {
         ComputeShader.SetTexture(0, "Result", renderTexture);
         ComputeShader.Dispatch(0, renderTexture.width / 8, renderTexture.height / 8, 1);   
     }
    
+    public static uint RandNoise1D(int pos = int.MaxValue, uint seed = 0 )
+    {
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        uint ret = (pos == int.MaxValue) ? RandCalled : (uint)pos;
+        seed = (seed == 0) ? RandCalled : seed;
+
+        //Randomness 
+        ret *= BITNOISE1;
+        ret += seed;
+        ret ^= (ret >> 8);
+        ret += BITNOISE2;
+        ret ^= (ret << 8);
+        ret *= BITNOISE3;
+        ret ^= (ret >> 8);
+        return ret; 
+    }
     
+    //Overload 0
+    public uint RandNoise(int posx = int.MaxValue,int posy =int.MaxValue, uint seed = 0)
+    {
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        posx =(int) ((posx == int.MaxValue) ? RandCalled : (uint)posx);
+        posy = (int) ((posy == int.MaxValue) ? RandCalled : (uint)posy);
+        seed = (seed == 0) ? RandCalled : seed;
+        uint ret =(uint) posx;
+        
+        //Randomness 
+        ret *= BITNOISE1;
+        ret += seed;
+        ret ^= (ret >> 8);
+        ret += BITNOISE2;
+        ret ^= (ret << 8);
+        ret *= BITNOISE3;
+        ret ^= (ret >> 8);
+        ret += (uint)posy;
+        return ret;
+    }
+
+    //Overload 2
+    public double RandNoise(Vector2 pos, uint seed = 0)
+    {
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        seed = (seed == 0) ? RandCalled : seed;
+        uint reti = (uint)pos.x*1000;
+
+        //Randomness 
+        reti *= BITNOISE1;
+        reti += seed;
+        reti ^= (reti >> 8);
+        reti += BITNOISE2;
+        reti ^= (reti << 8);
+        reti *= BITNOISE3;
+        reti ^= (reti >> 8);
+        double retf = (reti + Math.PI ) / 1000f; 
+        reti += (uint)pos.y;
+        return retf;
+    }
+
+    //Overload 3
+    public double RandNoise(Vector3 pos, uint seed = 0)
+    {
+        //slightly more random if used as rand(), don't know if partial class resets vars?
+        RandCalled++;
+        seed = (seed == 0) ? RandCalled : seed;
+        uint reti = (uint)(pos.x+2) * 1024;
+
+        //Randomness 
+        reti *= BITNOISE1;
+        reti += seed;
+        reti ^= (reti >> 8);
+        reti += BITNOISE2;
+        reti *= (uint)(pos.z + 2) * 1024;
+        reti ^= (reti << 8);
+        reti *= BITNOISE3;
+        reti ^= (reti >> 8);
+        double retf = (reti + Math.PI) / 1024f;
+        reti += (uint)pos.y;
+        return retf;
+    }
+
+    //Overload 0
+    public bool RandNoiseBool(float bias = 0.5f)
+    {
+        RandCalled++;
+        bool ret;
+        if (bias > 0.5f)
+        {
+            ret = (RandNoise1D() % (1 / (1-bias)) == 1);
+            ret = !ret;
+        } else { 
+            ret = (RandNoise1D() % (1 / bias) == 1);
+        }
+        return ret;
+	}
+
+    //Overload 1
+    public bool RandNoiseBool(Vector2 pos, float bias = 0.5f)
+    {
+        RandCalled++;
+        bool ret;
+        if (bias > 0.5f)
+        {
+            ret = (RandNoise(pos) % (1 / (1 - bias)) == 1);
+            ret = !ret;
+        }
+        else
+        {
+            ret = (RandNoise(pos) % (1 / bias) == 1);
+        }
+        return ret;
+    }
+    //Overload 2
+    public bool RandNoiseBool(Vector3 pos, float bias = 0.5f)
+    {
+        RandCalled++;
+        bool ret;
+        if (bias > 0.5f)
+        {
+            ret = (RandNoise(pos) % (1 / (1 - bias)) == 1);
+            ret = !ret;
+        }
+        else
+        {
+            ret = (RandNoise(pos) % (1 / bias) == 1);
+        }
+        return ret;
+    }
+
+    //float version (0-1) of RandNoise() 
+    /* public static float RandNoiseFloat(int pos = int.MaxValue, uint seed = 0)
+     {
+         //slightly more random if used as rand()
+         RandCalled++;
+         uint ret = (pos == int.MaxValue) ? RandCalled : (uint)pos;
+         seed = (seed == 0) ? RandCalled : seed;
+
+         //Randomness 
+         ret *= BITNOISE1;
+         ret += seed;
+         ret ^= (ret >> 8);
+         ret += BITNOISE2;
+         ret ^= (ret << 8);
+         ret *= BITNOISE3;
+         ret ^= (ret >> 8);
+         return ret;
+     }*/
+
+
+
 }

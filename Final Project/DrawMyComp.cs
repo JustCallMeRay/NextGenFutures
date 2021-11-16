@@ -26,7 +26,7 @@ public class DrawMyComp : MonoBehaviour
 
     private void Start()
 	{
-        renderTexture = new RenderTexture(resolution[0], resolution[1], 24);    //3d texture?
+        //renderTexture = new RenderTexture(resolution[0], resolution[1], 24);    //3d texture?
         ProcGen.DebugComputeShader(renderTexture, computeShader, points, item);
         GetComponent<Renderer>().material.SetTexture("_MainTex", renderTexture);
         InvokeRepeating("CallRefresh", 0.5f,0.5f);    //Doesn't work first time
@@ -36,7 +36,7 @@ public class DrawMyComp : MonoBehaviour
     {
         //computeShader.SetTexture(0, "Result", renderTexture);
        // computeShader.Dispatch(0, renderTexture.width / 8, renderTexture.height / 8, 1);
-        ProcGen.CallRefresh(computeShader, renderTexture);  //dont run me 
+        ProcGen.RefreshCompute(computeShader, renderTexture);  //dont run me 
         GetComponent<Renderer>().material.SetTexture("_MainTex", renderTexture);
         computeShader.SetVectorArray("points",points);   
         //I can't have a vector in hlsl but they still call it a vec ::angry::
