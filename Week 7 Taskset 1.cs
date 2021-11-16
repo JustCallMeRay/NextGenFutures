@@ -29,7 +29,7 @@ public class Mycoin : MonoBehaviour
     {
         CoinFlipAnim.Play();
         int rand = Mathf.RoundToInt(Random.value);
-        material.SetInteger("Face", rand);
+        material.SetInteger("Face", rand);	// anim shopuld take longer than a drawcall, else weirdness 
         return (rand == 1);
 	}
 }
