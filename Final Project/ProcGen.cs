@@ -11,7 +11,7 @@ public partial class ProcGen
     private const uint BITNOISE1 = 0xB5297A4D;
     private const uint BITNOISE2 = 0x68E31DA4;
     private const uint BITNOISE3 = 0x1B56C4E9;
-    private static uint RandCalled = 0;     //Makes things slightly more random
+    private static uint RandCalled = 1;     //Increases randomness
     public static Vector4[] DebugPoints()
     {
             return new Vector4[]      //~~float2 on shader, float 4 on cpu?~~
@@ -84,7 +84,7 @@ public partial class ProcGen
     }
     
     //Overload 0
-    [Obsolete("Use a vector 2 instead")]
+    [Obsolete("Use a vector 2 or RandNoise1D")]
     public uint RandNoise(int posx = int.MaxValue,int posy =int.MaxValue, uint seed = 0)
     {
         //slightly more random if used as rand(), don't know if partial class resets vars?
@@ -173,41 +173,6 @@ public partial class ProcGen
 
 
     //Overload 0
-    public double RandNoisefloat0to1(Vector2 pos, uint seed = 0)
-    {
-        return RandNoise(pos, seed) / uint.MaxValue;
-    }
-    //Overload 1
-    public double RandNoisefloat0to1(Vector3 pos, uint seed = 0)
-    {
-        return RandNoise(pos, seed) / uint.MaxValue;
-	}
-    //Overload 2
-    public double RandNoisefloat0to1(Vector4 pos, uint seed = 0)
-    {
-        return RandNoise(pos, seed) / uint.MaxValue;
-    }
-
-
-    //Overload 0
-    public double RandNoiseFNeg1to1(Vector2 pos, uint seed = 0)
-    {
-        return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
-    }
-    //Overload 1
-    public double RandNoiseFNeg1to1(Vector3 pos, uint seed = 0)
-    {
-		return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
-    }
-    //Overload 2
-    public double RandNoiseFNeg1to1(Vector4 pos, uint seed = 0)
-    {
-        return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
-    }
-
-
-
-    //Overload 0
     public double RandNoisef(Vector2 pos, uint seed = 0)
     {
         //slightly more random if used as rand(), don't know if partial class resets vars?
@@ -272,71 +237,71 @@ public partial class ProcGen
 
 
     //Overload 0
-    public bool RandNoiseBool(float bias = 0.5f)
+    public double RandNoisefloat0to1(Vector2 pos, uint seed = 0)
+    {
+        return RandNoise(pos, seed) / uint.MaxValue;
+    }
+    //Overload 1
+    public double RandNoisefloat0to1(Vector3 pos, uint seed = 0)
+    {
+        return RandNoise(pos, seed) / uint.MaxValue;
+	}
+    //Overload 2
+    public double RandNoisefloat0to1(Vector4 pos, uint seed = 0)
+    {
+        return RandNoise(pos, seed) / uint.MaxValue;
+    }
+    //Overload 3
+    public double RandNoisefloat0to1(int pos, uint seed = 0)
+    {
+        return RandNoise1D(pos, seed) / uint.MaxValue;
+    }
+
+
+    //Overload 0
+    public double RandNoiseFNeg1to1(Vector2 pos, uint seed = 0)
+    {
+        return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
+    }
+    //Overload 1
+    public double RandNoiseFNeg1to1(Vector3 pos, uint seed = 0)
+    {
+		return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
+    }
+    //Overload 2
+    public double RandNoiseFNeg1to1(Vector4 pos, uint seed = 0)
+    {
+        return (RandNoise(pos, seed) / (uint.MaxValue / 2)) - 1;
+    }
+    //Overload 3 
+    public double RandNoiseFNeg1to1(int pos, uint seed = 0)
+    {
+        return (RandNoise1D(pos, seed) / (int.MaxValue / 2)) - 1;
+    }
+
+
+    //Overload 0
+    public bool RandNoiseBool(int pos, float bias = 0.5f)
     {
         RandCalled++;
-        bool ret;
-        if (bias > 0.5f)
-        {
-            ret = (RandNoise1D() % (1 / (1-bias)) == 1);
-            ret = !ret;
-        } else { 
-            ret = (RandNoise1D() % (1 / bias) == 1);
-        }
-        return ret;
+        return (Mathf.Round((float)RandNoisefloat0to1(pos)+bias -0.5f) == 1);
 	}
     //Overload 1
     public bool RandNoiseBool(Vector2 pos, float bias = 0.5f)
     {
         RandCalled++;
-        bool ret;
-        if (bias > 0.5f)
-        {
-            ret = (RandNoise(pos) % (1 / (1 - bias)) == 1);
-            ret = !ret;
-        }
-        else
-        {
-            ret = (RandNoise(pos) % (1 / bias) == 1);
-        }
-        return ret;
+        return (Mathf.Round((float)RandNoisefloat0to1(pos) + bias - 0.5f) == 1);
     }
     //Overload 2
     public bool RandNoiseBool(Vector3 pos, float bias = 0.5f)
     {
         RandCalled++;
-        bool ret;
-        if (bias > 0.5f)
-        {
-            ret = (RandNoise(pos) % (1 / (1 - bias)) == 1);
-            ret = !ret;
-        }
-        else
-        {
-            ret = (RandNoise(pos) % (1 / bias) == 1);
-        }
-        return ret;
+        return (Mathf.Round((float)RandNoisefloat0to1(pos) + bias - 0.5f) == 1);
     }
-
-    //float version (0-1) of RandNoise() 
-    /* public static float RandNoiseFloat(int pos = int.MaxValue, uint seed = 0)
-     {
-         //slightly more random if used as rand()
-         RandCalled++;
-         uint ret = (pos == int.MaxValue) ? RandCalled : (uint)pos;
-         seed = (seed == 0) ? RandCalled : seed;
-
-         //Randomness 
-         ret *= BITNOISE1;
-         ret += seed;
-         ret ^= (ret >> 8);
-         ret += BITNOISE2;
-         ret ^= (ret << 8);
-         ret *= BITNOISE3;
-         ret ^= (ret >> 8);
-         return ret;
-     }*/
-
-
+    //Overload 3
+    public bool RandNoiseBool(Vector4 pos, float bias = 0.5f ){
+        RandCalled++;
+        return (Mathf.Round((float)RandNoisefloat0to1(pos) + bias - 0.5f) == 1);
+    }
 
 }
