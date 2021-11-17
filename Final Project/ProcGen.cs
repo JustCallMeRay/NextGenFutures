@@ -6,7 +6,7 @@ using UnityEngine;
 public partial class ProcGen
 {
     public static ComputeShader DefaultComp; //get a ref to compute shader? 
-    public static RenderTexture DefaultRT;      // and set as const 
+    public static RenderTexture DefaultRT;      // and set as "const" (ref types can't be const)
     public static int[] Threadcount;     //unused
     private const uint BITNOISE1 = 0xB5297A4D;
     private const uint BITNOISE2 = 0x68E31DA4;
@@ -33,17 +33,16 @@ public partial class ProcGen
     public static void DebugComputeShader(
         RenderTexture renderTexture,
         ComputeShader ComputeShader,
-        Vector4[] POINTS =null,
-        int resolutionx = 256,
-        int resolutiony = 256,
-        int Threadcountx = 8,
-        int Threadcounty = 8
+        Vector4[] POINTS = null,
+        uint resolutionx = 256,
+        uint resolutiony = 256,
+        uint Threadcountx = 8,
+        uint Threadcounty = 8
         )
     {
         POINTS = (POINTS == null ? DebugPoints() : POINTS);
         //ComputeShader = (ComputeShader == null ? defRef : ComputeShader);
-        int[] resolution = { resolutionx, resolutiony };
-        renderTexture = new RenderTexture(resolution[0], resolution[1], 24);
+        renderTexture = new RenderTexture((int)resolutionx, (int)resolutiony, 24);
         renderTexture.enableRandomWrite = true;
         renderTexture.Create();
 
@@ -53,10 +52,8 @@ public partial class ProcGen
         ComputeShader.SetVectorArray("points", POINTS);
 
         ComputeShader.Dispatch(0,
-            renderTexture.width / Threadcountx,
-            renderTexture.height / Threadcounty, 1);
-        new WaitForSeconds(0.5f);
-        RefreshCompute(ComputeShader, renderTexture);
+              (renderTexture.width / (int)Threadcountx),
+              (renderTexture.height / (int)Threadcounty), 1);    
     }
 
     public static void RefreshCompute(ComputeShader ComputeShader, RenderTexture renderTexture)
@@ -65,6 +62,7 @@ public partial class ProcGen
         ComputeShader.Dispatch(0, renderTexture.width / 8, renderTexture.height / 8, 1);   
     }
    
+    
     public static uint RandNoise1D(int pos = int.MaxValue, uint seed = 0 )
     {
         //slightly more random if used as rand(), don't know if partial class resets vars?
@@ -303,5 +301,5 @@ public partial class ProcGen
         RandCalled++;
         return (Mathf.Round((float)RandNoisefloat0to1(pos) + bias - 0.5f) == 1);
     }
-
+    
 }

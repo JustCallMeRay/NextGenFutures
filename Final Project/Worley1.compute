@@ -74,7 +74,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 {
 	//Result[id.xy] = float4(id.x / res.x, id.y / res.y, 0, 1);
 	
-	Result[id.xy] = float4(getmin(id.xy / res.xy).rgba);
+	Result[id.xy] = float4(getmin(id.xy / res.xy).rgb,1);
 	//Result[id.xy] = float4(points[res.z].xyz, 1);
     
 
