@@ -1,17 +1,20 @@
-using System;       //first time i've needed this XD
+using System;       //first time I've needed this 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public partial class ProcGen
 {
-    public static ComputeShader DefaultComp; //get a ref to compute shader? 
-    public static RenderTexture DefaultRT;      // and set as "const" (ref types can't be const)
+    public static ComputeShader _defaultComp = (ComputeShader)Resources.Load("Worley1");
+    public static RenderTexture _defaultRT = new RenderTexture(_defaultRes.x, _defaultRes.y, 24);
+    public static Vector2Int _defaultRes = new Vector2Int(256, 256);
     public static int[] Threadcount;     //unused
     private const uint BITNOISE1 = 0xB5297A4D;
     private const uint BITNOISE2 = 0x68E31DA4;
     private const uint BITNOISE3 = 0x1B56C4E9;
     private static uint RandCalled = 1;     //Increases randomness
+
+
     public static Vector4[] DebugPoints()
     {
             return new Vector4[]      //~~float2 on shader, float 4 on cpu?~~
@@ -41,8 +44,8 @@ public partial class ProcGen
         )
     {
         POINTS = (POINTS == null ? DebugPoints() : POINTS);
-        //ComputeShader = (ComputeShader == null ? defRef : ComputeShader);
-        renderTexture = new RenderTexture((int)resolutionx, (int)resolutiony, 24);
+		ComputeShader ??= _defaultComp; //if null change
+		renderTexture = new RenderTexture((int)resolutionx, (int)resolutiony, 24);
         renderTexture.enableRandomWrite = true;
         renderTexture.Create();
 
@@ -58,6 +61,7 @@ public partial class ProcGen
 
     public static void RefreshCompute(ComputeShader ComputeShader, RenderTexture renderTexture)
     {
+        ComputeShader ??= _defaultComp; //if null change
         ComputeShader.SetTexture(0, "Result", renderTexture);
         ComputeShader.Dispatch(0, renderTexture.width / 8, renderTexture.height / 8, 1);   
     }
@@ -251,7 +255,7 @@ public partial class ProcGen
     }
     //Overload 3
     public double RandNoisefloat0to1(int pos, uint seed = 0)
-    {
+	{
         return RandNoise1D(pos, seed) / uint.MaxValue;
     }
 
